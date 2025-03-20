@@ -1,24 +1,26 @@
 // app.js
 const express = require('express');
 const path = require('path');
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to serve static files
+// Middleware
+app.use(express.json());             // To parse JSON bodies
+app.use(bodyParser.urlencoded({ extended: true })); // To parse URL-encoded bodies
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'ejs');
 
-// Dummy product data
-const products = [
-    { id: 1, name: 'Product 1', price: 100 },
-    { id: 2, name: 'Product 2', price: 200 },
-    { id: 3, name: 'Product 3', price: 300 }
-];
+// Routes
+const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/cart');
 
-// Home route to display products
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+
+// Default route for frontend (optional)
 app.get('/', (req, res) => {
-    res.render('index', { products });
+    res.send('Welcome to the Simple Store API. Use /api/products to view products.');
 });
 
 app.listen(PORT, () => {
